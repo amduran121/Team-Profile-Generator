@@ -50,78 +50,106 @@ function app() {
         idArray.push(answers.managerId);
         createTeam();
       });
-          }
-  function Intern() {
+  }
+  function addIntern() {
     console.log("Enter information for your interns");
-    inquirer.prompt([
-      {
-        type: "input",
-        name: "internName",
-        message: "Input intern(s) name(s)",
-      },
-      {
-        name: "internId",
-        message: "Input interns name",
-      },
-      {
-        name: "internEmail",
-        message: "Input interns email",
-      },
-       .then((answers) => {
+    inquirer
+      .prompt([
+        {
+          type: "input",
+          name: "internName",
+          message: "Input intern(s) name(s)",
+        },
+        {
+          name: "internId",
+          message: "Input interns ID",
+        },
+        {
+          name: "internEmail",
+          message: "Input interns email",
+        },
+        {
+          name: "internSchool",
+          message: "Input intern's school",
+        },
+      ])
+      .then((answers) => {
         const intern = new Intern(
           answers.internName,
           answers.internId,
           answers.internEmail,
           answers.internSchool
         );
-        teamMembers.push(manager);
-        idArray.push(answers.managerId);
+        teamMembers.push(intern);
+        idArray.push(answers.internId);
         createTeam();
       });
-    ]);
-    
   }
-   function Employee() {
-     console.log("Enter information for your interns");
-     inquirer.prompt([
-       {
-         type: "input",
-         name: "employee name",
-         message: "Input employee(s) name(s)",
-       },
-       {
-         name: "employeeId",
-         message: "Input interns ID number",
-       },
-       {
-         name: "employeeEmail",
-         message: "Input employees email",
-       },
-     ]);
-   }
-
+  function addEngineer() {
+    console.log("Enter information for your engineer");
+    inquirer
+      .prompt([
+        {
+          type: "input",
+          name: "engineerName",
+          message: "Input engineer's name",
+        },
+        {
+          name: "engineerId",
+          message: "Input engineer ID",
+        },
+        {
+          name: "engineerEmail",
+          message: "Input engineer email",
+        },
+        {
+          name: "engineerGitHub",
+          message: "Enter engineer's gitHub",
+        },
+      ])
+      .then((answers) => {
+        const engineer = new Engineer(
+          answers.engineerName,
+          answers.engineerId,
+          answers.engineerEmail,
+          answers.engineerGitHub
+        );
+        teamMembers.push(engineer);
+        idArray.push(answers.engineerId);
+        createTeam();
+      });
+  }
+  function buildSite() {
+    if (!fs.existsSync(OUTPUT_DIR)) {
+      fs.mkdirSync(OUTPUT_DIR);
+    }
+    fs.writeFileSync(OUTPUT_PATH, render(teamMembers), "utf-8");
+  }
   function createTeam() {
     //inquirer prompt what type of team member to add, after that we need a .then to assess the user choice, and inside of that .then we will write a switch case, and depending on response we will add engineer or intern or create the site.
     var inquirer = require("inquirer");
-    inquirer.prompt([
-      {
-        type: "input",
-        name: "numEmployees",
-        message: "Enter number of employees",
-      },
-      {
-        name: "numEngineers",
-        message: "Enter number of engineers",
-      },
-      {
-        name: "numInterns",
-        message: "Enter number of interns",
-      },
-
-      // .then(answers => {
-      //   const createTeam = new
-      // })
-    ]);
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          name: "employeeType",
+          message: "What type of employee would you like to add",
+          choices: ["Engineer", "Intern", "No more employees"],
+        },
+      ])
+      .then((answer) => {
+        console.log(answer);
+        switch (answer.employeeType) {
+          case "Engineer":
+            addEngineer();
+            break;
+          case "Intern":
+            addIntern();
+          default:
+            buildSite();
+            break;
+        }
+      });
   }
   createManager();
 }
